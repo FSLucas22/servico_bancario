@@ -29,5 +29,5 @@ def criar_conta() -> Conta:
 def quantidade_operacoes(conta: Conta) -> int:
     return len(conta)
 
-def realizar_operacao(conta: Conta, operacao: Operacao) -> None:
-    conta.append(operacao)
+def saldo_conta(conta: Conta) -> int:
+    return 0
