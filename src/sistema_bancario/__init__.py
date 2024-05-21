@@ -14,8 +14,10 @@ def criar_conta() -> Conta:
                   "quantidade_saques_do_dia": 0,
                   "valor_limite_saque": 500.0})
 
+
 def quantidade_operacoes(conta: Conta) -> int:
     return len(conta["operacoes"])
+
 
 def saldo_conta(conta: Conta) -> int:
     return conta["saldo"]
