@@ -1,12 +1,20 @@
 from typing import NewType, Any
 
-Deposito = NewType("Deposito", dict[str, Any])
+Operacao = NewType("Operacao", dict[str, Any])
+Deposito = NewType("Deposito", Operacao)
+Saque = NewType("Saque", Operacao)
 Conta = NewType("Conta", list[str])
 
 def criar_deposito(valor: float) -> Deposito:
-    return Deposito({"tipo": "Depósito", "valor": valor})
+    return Deposito(Operacao({"tipo": "Depósito", "valor": valor}))
 
-def tipo_operacao(operacao: Deposito) -> str:
+def criar_saque(valor: float) -> Saque:
+    return Saque(Operacao({"tipo": "Saque", "valor": valor}))
+
+def valor_saque(saque: Saque) -> float:
+    return saque["valor"]
+
+def tipo_operacao(operacao: Operacao) -> str:
     return operacao["tipo"]
 
 def valor_deposito(deposito: Deposito) -> float:
