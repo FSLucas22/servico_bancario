@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Callable, NewType, Any
 from . import exceptions
 from . import operacao
@@ -16,8 +17,8 @@ def criar_conta() -> Conta:
                   "valor_limite_saque": 500.0})
 
 
-def operacoes_conta(conta: Conta) -> list[dict[str, Any]]:
-    return [operacao.converter_para_dict(op) for op in conta["operacoes"]]
+def operacoes_conta(conta: Conta) -> Iterable[dict[str, Any]]:
+    return (operacao.converter_para_dict(op) for op in conta["operacoes"])
 
 
 def quantidade_operacoes(conta: Conta) -> int:
