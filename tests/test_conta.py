@@ -1,6 +1,4 @@
-from typing import Any
 import src.sistema_bancario as app
-import pytest
 
 
 def test_deve_criar_conta_sem_operacoes() -> None:
