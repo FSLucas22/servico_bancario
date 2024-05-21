@@ -36,3 +36,7 @@ def realizar_deposito(conta: Conta, deposito: Deposito) -> None:
     conta["operacoes"].append(deposito)
     conta["saldo"] += valor_deposito(deposito)
 
+def realizar_saque(conta: Conta, saque: Saque) -> None:
+    conta["operacoes"].append(saque)
+    conta["saldo"] -= valor_saque(saque)
+
