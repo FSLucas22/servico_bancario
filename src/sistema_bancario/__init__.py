@@ -4,7 +4,7 @@ from . import exceptions
 Operacao = NewType("Operacao", dict[str, Any])
 Deposito = NewType("Deposito", Operacao)
 Saque = NewType("Saque", Operacao)
-Conta = NewType("Conta", list[Operacao])
+Conta = NewType("Conta", dict[str, Any])
 
 def criar_deposito(valor: float) -> Deposito:
     if valor <= 0:
@@ -24,10 +24,15 @@ def valor_deposito(deposito: Deposito) -> float:
     return deposito["valor"]
 
 def criar_conta() -> Conta:
-    return Conta([])
+    return Conta({"saldo": 0.0, "operacoes": []})
 
 def quantidade_operacoes(conta: Conta) -> int:
-    return len(conta)
+    return len(conta["operacoes"])
 
 def saldo_conta(conta: Conta) -> int:
-    return 0
+    return conta["saldo"]
+
+def realizar_deposito(conta: Conta, deposito: Deposito) -> None:
+    conta["operacoes"].append(deposito)
+    conta["saldo"] += valor_deposito(deposito)
+
