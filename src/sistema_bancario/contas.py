@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from typing import Any, NewType
 
-from . import operacao
+from . import operacoes
 
 
 Conta = NewType("Conta", dict[str, Any])
@@ -16,7 +16,7 @@ def criar_conta() -> Conta:
 
 
 def operacoes_conta(conta: Conta) -> Iterable[dict[str, Any]]:
-    return (operacao.converter_para_dict(op) for op in conta["operacoes"])
+    return (operacoes.converter_para_dict(op) for op in conta["operacoes"])
 
 
 def quantidade_operacoes(conta: Conta) -> int:
@@ -47,5 +47,5 @@ def adicionar_saldo(conta: Conta, saldo: float) -> None:
     conta["saldo"] += saldo
 
 
-def adicionar_operacao(conta: Conta, operacao: operacao.Operacao) -> None:
+def adicionar_operacao(conta: Conta, operacao: operacoes.Operacao) -> None:
     conta["operacoes"].append(operacao)

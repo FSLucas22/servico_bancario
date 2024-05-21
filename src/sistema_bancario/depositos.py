@@ -1,9 +1,9 @@
 from . import exceptions
-from . import operacao
+from . import operacoes
 from typing import NewType, Any
 
 
-Deposito = NewType("Deposito", operacao.Operacao)
+Deposito = NewType("Deposito", operacoes.Operacao)
 
 
 def criar_deposito(valor: float) -> Deposito:
@@ -13,7 +13,7 @@ def criar_deposito(valor: float) -> Deposito:
     def conversor() -> dict[str, Any]:
         return {"tipo": "Depósito", "valor": valor}
     
-    return Deposito(operacao.Operacao({"tipo": "Depósito",
+    return Deposito(operacoes.Operacao({"tipo": "Depósito",
                                         "valor": valor, 
                                         "conversor": conversor}))
 
