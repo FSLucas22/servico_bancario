@@ -1,3 +1,4 @@
+from typing import Any
 import src.sistema_bancario as app
 import pytest
 
@@ -71,3 +72,19 @@ def test_deve_lancar_error_ao_realizar_mais_saques_que_o_limite_diario() -> None
         app.realizar_saque(conta, app.saque.criar_saque(10.0))
     
     assert "Quantidade de saques realizados superior ao máximo permitido para o dia" in str(error_info)
+
+
+def test_deve_percorrer_operacoes() -> None:
+    conta = app.criar_conta()
+    app.realizar_deposito(conta, app.deposito.criar_deposito(100.0))
+    app.realizar_saque(conta, app.saque.criar_saque(10.0))
+
+    operacoes = []
+    def recebedor(operacao: dict[str, Any]) -> None:
+        tipo = operacao["tipo"]
+        valor = operacao["valor"]
+        operacoes.append(f"{tipo}-{valor}")
+
+    app.percorrer_operacoes(conta, recebedor)
+
+    assert operacoes == ["Depósito-100.0", "Saque-10.0"]

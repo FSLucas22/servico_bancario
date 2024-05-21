@@ -1,4 +1,4 @@
-from typing import NewType, Any
+from typing import Callable, NewType, Any
 from . import exceptions
 from . import operacao
 from . import deposito
@@ -14,6 +14,10 @@ def criar_conta() -> Conta:
                   "maximo_saques_diarios": 3,
                   "quantidade_saques_do_dia": 0,
                   "valor_limite_saque": 500.0})
+
+
+def operacoes_conta(conta: Conta) -> list[dict[str, Any]]:
+    return [operacao.converter_para_dict(op) for op in conta["operacoes"]]
 
 
 def quantidade_operacoes(conta: Conta) -> int:
@@ -68,4 +72,9 @@ def realizar_saque(conta: Conta, ssaque: saque.Saque) -> None:
 
     adicionar_operacao(conta, ssaque)
     adicionar_saldo(conta,  (-1) * saque.valor_saque(ssaque))
-    aumentar_quantidade_saques(conta)
+    aumentar_quantidade_saques(conta)    
+
+
+def percorrer_operacoes(conta: Conta, recebedor: Callable[[dict[str, Any]], None]):
+    for op in operacoes_conta(conta):
+        recebedor(op)
