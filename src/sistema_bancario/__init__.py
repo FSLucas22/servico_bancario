@@ -26,6 +26,8 @@ def valor_deposito(deposito: Deposito) -> float:
 def criar_conta() -> Conta:
     return Conta({"saldo": 0.0,
                   "operacoes": [],
+                  "maximo_saques_diarios": 3,
+                  "quantidade_saques_do_dia": 0,
                   "valor_limite_saque": 500.0})
 
 def quantidade_operacoes(conta: Conta) -> int:
@@ -33,6 +35,15 @@ def quantidade_operacoes(conta: Conta) -> int:
 
 def saldo_conta(conta: Conta) -> int:
     return conta["saldo"]
+
+
+def maximo_saques_diarios(conta: Conta) -> int:
+    return conta["maximo_saques_diarios"]
+
+
+def quantidade_saques_do_dia(conta: Conta) -> int:
+    return conta["quantidade_saques_do_dia"]
+
 
 def realizar_deposito(conta: Conta, deposito: Deposito) -> None:
     conta["operacoes"].append(deposito)
@@ -44,6 +55,11 @@ def valor_maximo_saque(conta: Conta) -> float:
 
 
 def realizar_saque(conta: Conta, saque: Saque) -> None:
+    if quantidade_saques_do_dia(conta) >= maximo_saques_diarios(conta):
+        raise exceptions.QuantidadeDeSaquesSuperiorAoLimiteException(
+            "Quantidade de saques realizados superior ao máximo permitido para o dia"
+        )
+    
     if valor_maximo_saque(conta) < valor_saque(saque):
         raise exceptions.SaqueAcimaDoValorLimiteException(
             "Valor do saque não pode ser superior ao valor limite da conta")
@@ -53,3 +69,5 @@ def realizar_saque(conta: Conta, saque: Saque) -> None:
 
     conta["operacoes"].append(saque)
     conta["saldo"] -= valor_saque(saque)
+    conta["quantidade_saques_do_dia"] += 1
+

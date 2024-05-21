@@ -8,3 +8,7 @@ class SaldoInsuficienteException(Exception):
 
 class SaqueAcimaDoValorLimiteException(Exception):
     pass
+
+
+class QuantidadeDeSaquesSuperiorAoLimiteException(Exception):
+    pass

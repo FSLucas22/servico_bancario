@@ -44,3 +44,29 @@ def test_nao_deve_permitir_saques_acima_do_valor_limite() -> None:
         app.realizar_saque(conta, saque)
     
     assert "Valor do saque não pode ser superior ao valor limite da conta" in str(error_info.value)
+
+
+def test_deve_ter_maximo_de_3_saques_diarios() -> None:
+    conta = app.criar_conta()
+    assert app.maximo_saques_diarios(conta) == 3
+
+
+def test_deve_contabilizar_a_quantidade_de_saques_do_dia() -> None:
+    conta = app.criar_conta()
+    assert app.quantidade_saques_do_dia(conta) == 0
+    app.realizar_deposito(conta, app.criar_deposito(100.0))
+    app.realizar_saque(conta, app.criar_saque(10.0))
+    assert app.quantidade_saques_do_dia(conta) == 1
+
+
+def test_deve_lancar_error_ao_realizar_mais_saques_que_o_limite_diario() -> None:
+    conta = app.criar_conta()
+    app.realizar_deposito(conta, app.criar_deposito(100.0))
+    app.realizar_saque(conta, app.criar_saque(10.0))
+    app.realizar_saque(conta, app.criar_saque(10.0))
+    app.realizar_saque(conta, app.criar_saque(10.0))
+
+    with pytest.raises(app.exceptions.QuantidadeDeSaquesSuperiorAoLimiteException) as error_info:
+        app.realizar_saque(conta, app.criar_saque(10.0))
+    
+    assert "Quantidade de saques realizados superior ao máximo permitido para o dia" in str(error_info)
