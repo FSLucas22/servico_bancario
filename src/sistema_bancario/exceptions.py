@@ -4,3 +4,7 @@ class DepositoInvalidoException(Exception):
 
 class SaldoInsuficienteException(Exception):
     pass
+
+
+class SaqueAcimaDoValorLimiteException(Exception):
+    pass
