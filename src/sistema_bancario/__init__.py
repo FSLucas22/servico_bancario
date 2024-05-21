@@ -37,6 +37,8 @@ def realizar_deposito(conta: Conta, deposito: Deposito) -> None:
     conta["saldo"] += valor_deposito(deposito)
 
 def realizar_saque(conta: Conta, saque: Saque) -> None:
+    if saldo_conta(conta) - valor_saque(saque) < 0:
+        raise exceptions.SaldoInsuficienteException("Saldo insuficiente para realizar o saque")
+
     conta["operacoes"].append(saque)
     conta["saldo"] -= valor_saque(saque)
-
