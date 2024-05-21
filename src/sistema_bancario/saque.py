@@ -1,4 +1,3 @@
-from . import exceptions
 from . import operacao
 from typing import NewType
 
