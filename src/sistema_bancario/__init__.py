@@ -4,6 +4,7 @@ from . import operacao
 from . import deposito
 from . import saque
 
+
 Conta = NewType("Conta", dict[str, Any])
 
 
@@ -31,13 +32,21 @@ def quantidade_saques_do_dia(conta: Conta) -> int:
     return conta["quantidade_saques_do_dia"]
 
 
-def realizar_deposito(conta: Conta, depo: deposito.Deposito) -> None:
-    conta["operacoes"].append(depo)
-    conta["saldo"] += deposito.valor_deposito(depo)
-
-
 def valor_maximo_saque(conta: Conta) -> float:
     return conta["valor_limite_saque"]
+
+
+def adicionar_saldo(conta: Conta, saldo: float) -> None:
+    conta["saldo"] += saldo
+
+
+def adicionar_operacao(conta: Conta, operacao: operacao.Operacao) -> None:
+    conta["operacoes"].append(operacao)
+
+
+def realizar_deposito(conta: Conta, depo: deposito.Deposito) -> None:
+    adicionar_operacao(conta, depo)
+    adicionar_saldo(conta, deposito.valor_deposito(depo))
 
 
 def realizar_saque(conta: Conta, ssaque: saque.Saque) -> None:
@@ -53,6 +62,6 @@ def realizar_saque(conta: Conta, ssaque: saque.Saque) -> None:
     if saldo_conta(conta) - saque.valor_saque(ssaque) < 0:
         raise exceptions.SaldoInsuficienteException("Saldo insuficiente para realizar o saque")
 
-    conta["operacoes"].append(ssaque)
-    conta["saldo"] -= saque.valor_saque(ssaque)
+    adicionar_operacao(conta, ssaque)
+    adicionar_saldo(conta,  (-1) * saque.valor_saque(ssaque))
     conta["quantidade_saques_do_dia"] += 1
