@@ -1,0 +1,2 @@
+class DepositoInvalidoException(Exception):
+    pass
