@@ -10,21 +10,21 @@ def test_deve_criar_conta_sem_operacoes() -> None:
 
 def test_deve_aumentar_o_saldo_com_deposito() -> None:
     conta = app.criar_conta()
-    app.realizar_deposito(conta, app.criar_deposito(100.0))
+    app.realizar_deposito(conta, app.deposito.criar_deposito(100.0))
     assert app.quantidade_operacoes(conta) == 1
     assert app.saldo_conta(conta) == 100.0
 
 
 def test_deve_diminuir_o_saldo_com_saque() -> None:
     conta = app.criar_conta()
-    app.realizar_deposito(conta, app.criar_deposito(100.0))
+    app.realizar_deposito(conta, app.deposito.criar_deposito(100.0))
     app.realizar_saque(conta, app.criar_saque(10.0))
     assert app.quantidade_operacoes(conta) == 2
     assert app.saldo_conta(conta) == 90.0
 
 def test_nao_deve_permitir_saque_de_valor_indisponivel() -> None:
     conta = app.criar_conta()
-    app.realizar_deposito(conta, app.criar_deposito(50.0))
+    app.realizar_deposito(conta, app.deposito.criar_deposito(50.0))
     
     with pytest.raises(app.exceptions.SaldoInsuficienteException) as error_info:
         app.realizar_saque(conta, app.criar_saque(100.0))
@@ -54,14 +54,14 @@ def test_deve_ter_maximo_de_3_saques_diarios() -> None:
 def test_deve_contabilizar_a_quantidade_de_saques_do_dia() -> None:
     conta = app.criar_conta()
     assert app.quantidade_saques_do_dia(conta) == 0
-    app.realizar_deposito(conta, app.criar_deposito(100.0))
+    app.realizar_deposito(conta, app.deposito.criar_deposito(100.0))
     app.realizar_saque(conta, app.criar_saque(10.0))
     assert app.quantidade_saques_do_dia(conta) == 1
 
 
 def test_deve_lancar_error_ao_realizar_mais_saques_que_o_limite_diario() -> None:
     conta = app.criar_conta()
-    app.realizar_deposito(conta, app.criar_deposito(100.0))
+    app.realizar_deposito(conta, app.deposito.criar_deposito(100.0))
     app.realizar_saque(conta, app.criar_saque(10.0))
     app.realizar_saque(conta, app.criar_saque(10.0))
     app.realizar_saque(conta, app.criar_saque(10.0))
