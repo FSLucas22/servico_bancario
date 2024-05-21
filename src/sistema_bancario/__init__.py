@@ -28,7 +28,7 @@ def maximo_saques_diarios(conta: Conta) -> int:
     return conta["maximo_saques_diarios"]
 
 
-def aumenta_quantidade_saques(conta: Conta) -> None:
+def aumentar_quantidade_saques(conta: Conta) -> None:
     conta["quantidade_saques_do_dia"] += 1
 
 
@@ -68,4 +68,4 @@ def realizar_saque(conta: Conta, ssaque: saque.Saque) -> None:
 
     adicionar_operacao(conta, ssaque)
     adicionar_saldo(conta,  (-1) * saque.valor_saque(ssaque))
-    aumenta_quantidade_saques(conta)
+    aumentar_quantidade_saques(conta)
