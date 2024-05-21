@@ -3,7 +3,7 @@ from typing import NewType, Any
 Operacao = NewType("Operacao", dict[str, Any])
 Deposito = NewType("Deposito", Operacao)
 Saque = NewType("Saque", Operacao)
-Conta = NewType("Conta", list[str])
+Conta = NewType("Conta", list[Operacao])
 
 def criar_deposito(valor: float) -> Deposito:
     return Deposito(Operacao({"tipo": "Depósito", "valor": valor}))
@@ -25,3 +25,6 @@ def criar_conta() -> Conta:
 
 def quantidade_operacoes(conta: Conta) -> int:
     return len(conta)
+
+def realizar_operacao(conta: Conta, operacao: Operacao) -> None:
+    conta.append(operacao)
