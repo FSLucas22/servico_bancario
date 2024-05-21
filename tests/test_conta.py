@@ -22,6 +22,7 @@ def test_deve_diminuir_o_saldo_com_saque() -> None:
     assert app.quantidade_operacoes(conta) == 2
     assert app.saldo_conta(conta) == 90.0
 
+
 def test_nao_deve_permitir_saque_de_valor_indisponivel() -> None:
     conta = app.criar_conta()
     app.realizar_deposito(conta, app.deposito.criar_deposito(50.0))

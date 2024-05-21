@@ -1,6 +1,7 @@
 import src.sistema_bancario as app
 import pytest
 
+
 def test_deve_extrair_dados_do_deposito() -> None:
     deposito = app.deposito.criar_deposito(100.00)
     assert app.operacao.tipo_operacao(deposito) == "Depósito"
