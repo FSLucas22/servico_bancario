@@ -1,5 +1,5 @@
 import sys
-from typing import Callable, Final, NoReturn
+from typing import Callable, Final, NoReturn, TypeAlias
 
 from . import depositos
 from . import contas
@@ -7,6 +7,9 @@ from . import banco
 from . import exceptions
 from . import extratos
 from . import saques
+
+
+Acao: TypeAlias = Callable[[contas.Conta], None]
 
 
 def get_float(msg: str, 
@@ -58,7 +61,7 @@ def imprimir_extrato(conta: contas.Conta) -> None:
     print(f'Saldo atual da conta: {extratos.saldo_extrato(extrato)}')
 
 
-MENU: Final[dict[str, tuple[str, Callable[[contas.Conta], None]]]] = {
+MENU: Final[dict[str, tuple[str, Acao]]] = {
     "D": ("Realizar depósito", tela_de_depositos),
     "S": ("Realizar saque", tela_de_saques),
     "E": ("Consultar extrato", imprimir_extrato),
@@ -74,7 +77,7 @@ Escolha a opção que deseja utilizar:""")
         print(f"[{opcao}] - {descricao}")
 
 
-def recebe_opcao_do_user() -> Callable[[], None]:
+def recebe_opcao_do_user() -> Acao:
     opcao = input(": ").upper().strip()
     return MENU.get(opcao, ("Ausente", lambda _: print(
         "Opção inválida! Por favor escolha uma das opções apresentadas")))[1]
