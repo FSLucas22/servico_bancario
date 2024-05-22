@@ -52,7 +52,9 @@ def imprimir_extrato(conta: contas.Conta) -> None:
         return
     
     print("Movimentações realizadas: ")
-    print('\n'.join(extratos.corpo_extrato(extrato)))
+
+    for operacao in extratos.corpo_extrato(extrato):
+        print(" - " + operacao)
     print(f'Saldo atual da conta: {extratos.saldo_extrato(extrato)}')
 
 
