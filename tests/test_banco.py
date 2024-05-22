@@ -72,3 +72,13 @@ def test_deve_percorrer_operacoes() -> None:
     app.banco.percorrer_operacoes(conta, recebedor)
 
     assert operacoes == ["Depósito-100.0", "Saque-10.0"]
+
+
+def test_deve_preencher_extrato() -> None:
+    conta = app.contas.criar_conta()
+    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(100.0))
+    app.banco.realizar_saque(conta, app.saques.criar_saque(35.45))
+    extrato = app.extratos.criar_extrato()
+    app.banco.preencher_extrato(conta, extrato)
+    assert app.extratos.corpo_extrato(extrato) == ("Depósito: R$ 100.00", "Saque: R$ 35.45")
+    assert app.extratos.saldo_extrato(extrato) == "R$ 64.55"

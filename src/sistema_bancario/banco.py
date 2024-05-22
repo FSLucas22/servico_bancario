@@ -1,5 +1,5 @@
 from typing import Any, Callable
-from . import contas, depositos, exceptions, saques
+from . import contas, depositos, exceptions, saques, extratos
 
 
 def realizar_deposito(conta: contas.Conta, deposito: depositos.Deposito) -> None:
@@ -28,3 +28,8 @@ def realizar_saque(conta: contas.Conta, saque: saques.Saque) -> None:
 def percorrer_operacoes(conta: contas.Conta, recebedor: Callable[[dict[str, Any]], None]):
     for op in contas.operacoes_conta(conta):
         recebedor(op)
+
+
+def preencher_extrato(conta: contas.Conta, extrato: extratos.Extrato) -> None:
+    percorrer_operacoes(conta, lambda op: extratos.adicionar_operacao(extrato, op))
+    extratos.atualizar_saldo(extrato, contas.saldo_conta(conta))
