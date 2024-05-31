@@ -46,8 +46,10 @@ def tela_de_saques(conta: contas.Conta) -> None:
 
 
 def imprimir_extrato(conta: contas.Conta) -> None:
-    extrato = extratos.criar_extrato()
-    banco.preencher_extrato(conta, extrato)
+    saldo = contas.saldo_conta(conta)
+    operacoes = contas.operacoes_conta(conta)
+    extrato = extratos.criar_extrato(saldo, extrato=operacoes)
+
     operacoes = extratos.corpo_extrato(extrato)
 
     if not operacoes:
@@ -56,7 +58,7 @@ def imprimir_extrato(conta: contas.Conta) -> None:
     
     print("Movimentações realizadas: ")
 
-    for operacao in extratos.corpo_extrato(extrato):
+    for operacao in operacoes:
         print(" - " + operacao)
     print(f'Saldo atual da conta: {extratos.saldo_extrato(extrato)}')
 
