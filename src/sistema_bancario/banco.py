@@ -2,12 +2,12 @@ from typing import Any, Callable
 from . import contas, depositos, exceptions, saques, extratos
 
 
-def realizar_deposito(conta: contas.Conta, deposito: depositos.Deposito) -> None:
+def realizar_deposito(conta: contas.Conta, deposito: depositos.Deposito, /) -> None:
     contas.adicionar_operacao(conta, deposito)
     contas.adicionar_saldo(conta, depositos.valor_deposito(deposito))
 
 
-def realizar_saque(conta: contas.Conta, saque: saques.Saque) -> None:
+def realizar_saque(*, conta: contas.Conta, saque: saques.Saque) -> None:
     if contas.quantidade_saques_do_dia(conta) >= contas.maximo_saques_diarios(conta):
         raise exceptions.QuantidadeDeSaquesSuperiorAoLimiteException(
             "Quantidade de saques realizados superior ao máximo permitido para o dia"

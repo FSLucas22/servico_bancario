@@ -37,7 +37,7 @@ def tela_de_saques(conta: contas.Conta) -> None:
     valor = get_float("Por favor digite o valor do saque: ",
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
-        banco.realizar_saque(conta, saques.criar_saque(valor))
+        banco.realizar_saque(conta=conta, saque=saques.criar_saque(valor))
         print("Saque realizado com sucesso!")
     except (exceptions.SaldoInsuficienteException,
             exceptions.SaqueAcimaDoValorLimiteException,
