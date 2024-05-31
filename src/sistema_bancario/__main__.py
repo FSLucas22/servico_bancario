@@ -50,15 +50,15 @@ def imprimir_extrato(conta: contas.Conta) -> None:
     operacoes = contas.operacoes_conta(conta)
     extrato = extratos.criar_extrato(saldo, extrato=operacoes)
 
-    operacoes = extratos.corpo_extrato(extrato)
+    corpo = extratos.corpo_extrato(extrato)
 
-    if not operacoes:
+    if not corpo:
         print("Não foram realizadas movimentações.")
         return
     
     print("Movimentações realizadas: ")
 
-    for operacao in operacoes:
+    for operacao in corpo:
         print(" - " + operacao)
     print(f'Saldo atual da conta: {extratos.saldo_extrato(extrato)}')
 
