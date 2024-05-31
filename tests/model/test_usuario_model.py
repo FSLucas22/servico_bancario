@@ -44,12 +44,12 @@ def test_deve_salvar_usuario(usuario_model, usuario) -> None:
 
 
 def test_deve_retornar_None_quando_cpf_nao_esta_salvo(usuario_model) -> None:
-    assert model.usuario_model.retorna_usuario_por_cpf("123456789", usuario_model) is None
+    assert model.usuario_model.retornar_usuario_por_cpf("123456789", usuario_model) is None
 
 
 def test_deve_retornar_usuario_por_cpf(usuario_model, usuario) -> None:
     model.usuario_model.salvar_usuario(usuario, usuario_model)
-    usuario_salvo = model.usuario_model.retorna_usuario_por_cpf("123456789", usuario_model)
+    usuario_salvo = model.usuario_model.retornar_usuario_por_cpf("123456789", usuario_model)
     
     assert usuario_salvo is not None
     assert_usuarios_iguais(usuario, usuario_salvo)
