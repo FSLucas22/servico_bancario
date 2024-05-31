@@ -12,3 +12,7 @@ class SaqueAcimaDoValorLimiteException(Exception):
 
 class QuantidadeDeSaquesSuperiorAoLimiteException(Exception):
     pass
+
+
+class CpfJaExisteException(Exception):
+    pass
