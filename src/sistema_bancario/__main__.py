@@ -37,7 +37,7 @@ def tela_de_saques(conta: contas.Conta) -> None:
     valor = get_float("Por favor digite o valor do saque: ",
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
-        banco.realizar_saque(conta, saques.criar_saque(valor))
+        banco.realizar_saque(conta=conta, saque=saques.criar_saque(valor))
         print("Saque realizado com sucesso!")
     except (exceptions.SaldoInsuficienteException,
             exceptions.SaqueAcimaDoValorLimiteException,
@@ -46,17 +46,19 @@ def tela_de_saques(conta: contas.Conta) -> None:
 
 
 def imprimir_extrato(conta: contas.Conta) -> None:
-    extrato = extratos.criar_extrato()
-    banco.preencher_extrato(conta, extrato)
-    operacoes = extratos.corpo_extrato(extrato)
+    saldo = contas.saldo_conta(conta)
+    operacoes = contas.operacoes_conta(conta)
+    extrato = extratos.criar_extrato(saldo, extrato=operacoes)
 
-    if not operacoes:
+    corpo = extratos.corpo_extrato(extrato)
+
+    if not corpo:
         print("Não foram realizadas movimentações.")
         return
     
     print("Movimentações realizadas: ")
 
-    for operacao in extratos.corpo_extrato(extrato):
+    for operacao in corpo:
         print(" - " + operacao)
     print(f'Saldo atual da conta: {extratos.saldo_extrato(extrato)}')
 
