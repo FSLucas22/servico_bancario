@@ -11,7 +11,7 @@ AGENCIA: Final[str] = "0001"
 Conta = NewType("Conta", dict[str, Any])
 
 
-def criar_conta(usuario: usuarios.Usuario | None = None,
+def criar_conta(usuario: usuarios.Usuario,
                 numero: int | None = None,
                 agencia: str = AGENCIA) -> Conta:
     return Conta({"usuario": usuario,
@@ -40,7 +40,7 @@ def maximo_saques_diarios(conta: Conta) -> int:
     return conta["maximo_saques_diarios"]
 
 
-def usuario_conta(conta: Conta) -> usuarios.Usuario | None:
+def usuario_conta(conta: Conta) -> usuarios.Usuario:
     return conta["usuario"]
 
 

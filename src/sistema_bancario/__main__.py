@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 from typing import Callable, Final, NoReturn, TypeAlias
 
@@ -7,6 +8,7 @@ from . import banco
 from . import exceptions
 from . import extratos
 from . import saques
+from . import usuarios
 
 
 Acao: TypeAlias = Callable[[contas.Conta], None]
@@ -87,7 +89,11 @@ def recebe_opcao_do_user() -> Acao:
 
 def main() -> NoReturn:
     try:
-        conta = contas.criar_conta()
+        usuario = usuarios.criar_usuario("Lucas",
+                                         datetime(1999, 6, 22),
+                                         "123456789",
+                                         "logradouro, 0001 - bairro - cidade/UF")
+        conta = contas.criar_conta(usuario)
         while True:
             mostra_menu()
             acao = recebe_opcao_do_user()
