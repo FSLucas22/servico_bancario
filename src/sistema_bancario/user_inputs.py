@@ -72,11 +72,12 @@ def get_cpf(value: str) -> str:
     raise ParserError
 
 
-Acao: TypeAlias = Callable[[contas.Conta], None]
-Menu: TypeAlias = dict[str, Acao]
+U = TypeVar("U")
+Acao: TypeAlias = Callable[[U], None]
+Menu: TypeAlias = dict[str, Acao[U]]
 
 
-def get_from_menu(menu: Menu, msg: str, error_msg: str) -> Acao:
+def get_from_menu(menu: Menu[U], msg: str, error_msg: str) -> Acao[U]:
     def parser(value: str) -> Acao:
         value = value.upper().strip()
         if value in menu:

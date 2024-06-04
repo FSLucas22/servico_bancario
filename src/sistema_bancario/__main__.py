@@ -1,5 +1,5 @@
 import sys
-from typing import Callable, Final, NoReturn, TypeAlias
+from typing import Callable, Final, NoReturn, TypeAlias, TypeVar
 
 from . import depositos
 from . import contas
@@ -15,7 +15,8 @@ from . import user_inputs
 from . import view
 
 
-Acao: TypeAlias = Callable[[contas.Conta], None]
+T = TypeVar("T")
+Acao: TypeAlias = Callable[[T], None]
 
 SECAO: secoes.Secao = secoes.criar_secao()
 USUARIO_MODEL: model.usuario_model.UsuarioModel = model.usuario_model.criar_usuario_model()
@@ -120,9 +121,9 @@ def encerrar_programa(_) -> None:
     sys.exit(0)
 
 
-Menu: TypeAlias = dict[str, Acao]
+Menu: TypeAlias = dict[str, Acao[T]]
 
-MENU_NAO_LOGADO: Final[Menu] = {
+MENU_NAO_LOGADO: Final[Menu[None]] = {
     "U": tela_cadastro_usuario,
     "L": tela_login,
     "Q": encerrar_programa
@@ -134,7 +135,7 @@ MENU_NAO_LOGADO_STR = {
     "Q": "Encerrar programar"
 }
 
-MENU: Final[Menu] = {
+MENU: Final[Menu[contas.Conta]] = {
     "D": tela_de_depositos,
     "S": tela_de_saques,
     "E": imprimir_extrato,
@@ -152,33 +153,46 @@ MENU_STR = {
 }
 
 
+def tela_operacoes(conta: contas.Conta) -> None:
+    nome_usuario = usuarios.nome_usuario(contas.usuario_conta(conta))
+    numero = contas.numero_conta(conta)
+    agencia = contas.agencia_conta(conta)
+    cabecalho = f"""Olá {nome_usuario}!
+Agência: {agencia}  -  Conta: {numero} 
+Escolha a opção que deseja utilizar:"""
+    
+    view.mostra_menu(cabecalho, MENU_STR)
+
+    acao = user_inputs.get_from_menu(
+        MENU, 
+        ": ",
+        "Opção inválida! Escolha uma das opções apresentadas!\n:"
+    )
+
+    acao(conta)
+
+
+def tela_inicial() -> None:
+    cabecalho = "Bem vindo! Escolha a opção que deseja utilizar:"
+    view.mostra_menu(cabecalho, MENU_NAO_LOGADO_STR)
+
+    acao = user_inputs.get_from_menu(
+        MENU_NAO_LOGADO, 
+        ": ",
+        "Opção inválida! Escolha uma das opções apresentadas!\n:"
+    )
+
+    acao(None)
+
+
 def tela_geral() -> None:
     while True:
         conta_ativa = secoes.valor_parametro(SECAO, "conta_ativa")
 
         if conta_ativa is not None:
-            nome_usuario = usuarios.nome_usuario(contas.usuario_conta(conta_ativa))
-            numero = contas.numero_conta(conta_ativa)
-            agencia = contas.agencia_conta(conta_ativa)
-
-            menu = MENU
-            menu_str = MENU_STR
-            cabecalho = f"""Olá {nome_usuario}!
-Agência: {agencia}  -  Conta: {numero} 
-Escolha a opção que deseja utilizar:"""
-            
+            tela_operacoes(conta_ativa)
         else:
-            menu = MENU_NAO_LOGADO
-            menu_str = MENU_NAO_LOGADO_STR
-            cabecalho = "Bem vindo! Escolha a opção que deseja utilizar:"
-        
-        view.mostra_menu(cabecalho, menu_str)
-        acao = user_inputs.get_from_menu(
-            menu, 
-            ": ",
-            "Opção inválida! Escolha uma das opções apresentadas!\n:"
-        )
-        acao(conta_ativa)
+            tela_inicial()
         print()
 
 
