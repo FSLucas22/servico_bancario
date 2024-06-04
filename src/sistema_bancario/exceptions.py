@@ -6,6 +6,10 @@ class SaldoInsuficienteException(Exception):
     pass
 
 
+class SaqueInvalidoException(Exception):
+    pass
+
+
 class SaqueAcimaDoValorLimiteException(Exception):
     pass
 
