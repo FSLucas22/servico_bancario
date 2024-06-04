@@ -72,3 +72,19 @@ def test_deve_retornar_conta_por_numero(conta_model, conta) -> None:
 def test_deve_retornar_None_quando_numero_nao_pertence_a_uma_conta(conta_model) -> None:
     conta_salva = model.conta_model.retornar_conta_por_numero(1, conta_model)
     assert conta_salva is None
+
+
+def test_deve_retornar_todas_as_contas_por_usuario(conta_model, conta) -> None:
+    model.conta_model.salvar_conta(conta, conta_model)
+    model.conta_model.salvar_conta(conta, conta_model)
+
+    usuario = app.usuarios.criar_usuario("", datetime(1999, 1, 1), "123456789", "")
+    contas = model.conta_model.retornar_contas_por_usuario(usuario, conta_model)
+    assert len(contas) == 2
+    assert app.contas.numero_conta(contas[0]) in [1, 2]
+    assert app.contas.numero_conta(contas[1]) in [1, 2]
+    assert app.contas.numero_conta(contas[1]) != app.contas.numero_conta(contas[0])
+
+
+def test_deve_retornar_lista_vazia_quando_usuario_sem_contas(conta_model, usuario) -> None:
+    assert len(model.conta_model.retornar_contas_por_usuario(usuario, conta_model)) == 0
