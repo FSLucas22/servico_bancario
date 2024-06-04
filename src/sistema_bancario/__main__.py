@@ -12,7 +12,8 @@ from . import usuarios
 from . import secoes
 
 from . import model
-from .view import user_inputs
+from . import user_inputs
+from . import view
 
 
 Acao: TypeAlias = Callable[[contas.Conta], None]
@@ -27,9 +28,9 @@ def tela_de_depositos(conta: contas.Conta) -> None:
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
         banco.realizar_deposito(conta, depositos.criar_deposito(valor))
-        print("Depósito realizado com sucesso!")
+        view.operacoes.novo_deposito(valor)
     except exceptions.DepositoInvalidoException as e:
-        print(f"Falha ao realizar depósito: {str(e)}")
+        view.falha(f"Falha ao realizar depósito: {str(e)}")
 
 
 def tela_de_saques(conta: contas.Conta) -> None:
@@ -37,11 +38,11 @@ def tela_de_saques(conta: contas.Conta) -> None:
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
         banco.realizar_saque(conta=conta, saque=saques.criar_saque(valor))
-        print("Saque realizado com sucesso!")
+        view.operacoes.novo_saque(valor)
     except (exceptions.SaldoInsuficienteException,
             exceptions.SaqueAcimaDoValorLimiteException,
             exceptions.QuantidadeDeSaquesSuperiorAoLimiteException) as e:
-        print(f"Falha ao realizar saque: {str(e)}")
+        view.falha(f"Falha ao realizar saque: {str(e)}")
 
 
 def imprimir_extrato(conta: contas.Conta) -> None:
@@ -49,17 +50,7 @@ def imprimir_extrato(conta: contas.Conta) -> None:
     operacoes = contas.operacoes_conta(conta)
     extrato = extratos.criar_extrato(saldo, extrato=operacoes)
 
-    corpo = extratos.corpo_extrato(extrato)
-
-    if not corpo:
-        print("Não foram realizadas movimentações.")
-        return
-    
-    print("Movimentações realizadas: ")
-
-    for operacao in corpo:
-        print(" - " + operacao)
-    print(f'Saldo atual da conta: {extratos.saldo_extrato(extrato)}')
+    view.operacoes.mostra_extrato(extrato)
 
 
 def tela_cadastro_usuario(_) -> None:
@@ -80,8 +71,10 @@ def tela_cadastro_usuario(_) -> None:
 
         usuario = usuarios.criar_usuario(nome, data_nascimento, cpf, endereco)
         model.usuario_model.salvar_usuario(usuario, USUARIO_MODEL)
+
+        view.cadastro.mostra_novo_usuario(nome, data_nascimento, cpf, endereco)
     except exceptions.CpfJaExisteException as e:
-        print(f"Falha ao cadastrar usuário: {e}.")
+        view.falha(f"Falha ao cadastrar usuário: {e}.")
 
 
 def tela_login(_) -> None:
@@ -90,7 +83,7 @@ def tela_login(_) -> None:
     usuario = model.usuario_model.retornar_usuario_por_cpf(cpf, USUARIO_MODEL)
 
     if usuario is None:
-        print("Usuário não cadastrado!")
+        view.falha("Usuário não cadastrado!")
         return
         
     while True:
@@ -111,7 +104,9 @@ def tela_login(_) -> None:
         if opcao == ultima_opcao:
             conta = contas.criar_conta(usuario)
             model.conta_model.salvar_conta(conta, CONTA_MODEL)
-            print("Conta criada com sucesso!")
+            numero = contas.numero_conta(conta)
+            agencia = contas.agencia_conta(conta)
+            view.cadastro.mostra_nova_conta(numero, agencia)
         elif opcao < ultima_opcao:
             secoes.salvar_parametro(SECAO, "conta_ativa", contas_usuario[opcao])
             break
@@ -119,7 +114,7 @@ def tela_login(_) -> None:
 
 def sair_da_conta(_) -> None:
     secoes.deletar_parametro(SECAO, "conta_ativa")
-    print("Logout realizado com sucesso!")
+    view.sucesso("Logout realizado com sucesso!")
 
 
 def encerrar_programa(_) -> None:
@@ -157,14 +152,6 @@ def recebe_opcao_do_user(menu: Menu) -> Acao:
 
 
 def tela_geral() -> None:
-    usuario = usuarios.criar_usuario("Lucas",
-                                        datetime(1999, 6, 22),
-                                        "123456789",
-                                        "logradouro, 0001 - bairro - cidade/UF")
-    conta = contas.criar_conta(usuario)
-    
-    secoes.salvar_parametro(SECAO, "conta_ativa", conta)
-    
     while True:
         conta_ativa = secoes.valor_parametro(SECAO, "conta_ativa")
 
@@ -196,9 +183,9 @@ def main() -> NoReturn:
         tela_geral()
         sys.exit(0)
     except Exception as e:
-        print("Ocorreu um erro inesperado. Contate o administrador do sistema.")
-        print("Informações:")
-        print(e)
+        view.falha("""Ocorreu um erro inesperado. Contate o administrador do sistema.
+Informações:
+{e}""")
         sys.exit(1)
 
 
