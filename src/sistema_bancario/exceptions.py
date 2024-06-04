@@ -20,3 +20,7 @@ class QuantidadeDeSaquesSuperiorAoLimiteException(Exception):
 
 class CpfJaExisteException(Exception):
     pass
+
+
+class ContaNaoExisteException(Exception):
+    pass

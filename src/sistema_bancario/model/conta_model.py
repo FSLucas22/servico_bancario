@@ -1,5 +1,8 @@
 from typing import NewType
 
+from .. import saques
+from .. import exceptions
+from .. import depositos
 from .. import contas
 from .. import usuarios
 
@@ -41,3 +44,27 @@ def retornar_contas_por_usuario(usuario: usuarios.Usuario,
         if usuarios.cpf_usuario(u) == usuarios.cpf_usuario(usuario):
             resultados.append(c)
     return resultados
+
+
+def realizar_deposito(conta: contas.Conta, 
+                      deposito: depositos.Deposito, 
+                      model: ContaModel) -> None:
+    numero = contas.numero_conta(conta)
+    agencia = contas.agencia_conta(conta)
+    conta_salva = retornar_conta_por_numero(numero, model, agencia=agencia)
+
+    if conta_salva is None:
+        raise exceptions.ContaNaoExisteException(
+            f"Conta não existe com número {numero} e agência {agencia}")
+    contas.adicionar_operacao(conta_salva, deposito)
+    contas.adicionar_saldo(conta_salva, depositos.valor_deposito(deposito))
+
+
+def realizar_saque(conta: contas.Conta, saque: saques.Saque, model: ContaModel) -> None:
+    numero = contas.numero_conta(conta)
+    agencia = contas.agencia_conta(conta)
+    conta_salva = retornar_conta_por_numero(numero, model, agencia=agencia)
+
+    contas.adicionar_operacao(conta_salva, saque)
+    contas.adicionar_saldo(conta_salva, (-1) * saques.valor_saque(saque))
+    
