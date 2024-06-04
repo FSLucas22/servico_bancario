@@ -12,6 +12,7 @@ from . import usuarios
 from . import secoes
 
 from . import model
+from .view import user_inputs
 
 
 Acao: TypeAlias = Callable[[contas.Conta], None]
@@ -21,62 +22,8 @@ USUARIO_MODEL: model.usuario_model.UsuarioModel = model.usuario_model.criar_usua
 CONTA_MODEL: model.conta_model.ContaModel = model.conta_model.criar_conta_model()
 
 
-def get_float(msg: str, 
-              error_msg: str | None = None) -> float:
-    if error_msg is None:
-        error_msg = msg
-
-    try:
-        return float(input(msg))
-    except ValueError:
-        return get_float(error_msg, error_msg)
-
-
-def get_natural(msg: str, 
-            error_msg: str | None = None) -> int:
-    if error_msg is None:
-        error_msg = msg
-
-    try:
-        return int(input(msg))
-    except ValueError:
-        return get_natural(error_msg, error_msg)
-
-
-def get_str(msg: str, error_msg: str | None = None) -> str:
-    if error_msg is None:
-        error_msg = msg
-    
-    result = input(msg)
-    if not result:
-        return get_str(error_msg, error_msg)
-    return result
-
-
-def get_date(msg: str, error_msg: str | None = None,
-             format: str = "%d/%m/%Y") -> datetime:
-    if error_msg is None:
-        error_msg = msg
-    
-    try:
-        return datetime.strptime(input(msg), format)
-    except ValueError as e:
-        print(e)
-        return get_date(error_msg, error_msg, format)
-
-
-def get_cpf(msg: str, error_msg: str | None = None) -> str:
-    if error_msg is None:
-        error_msg = msg
-    
-    result = input(msg)
-    if not result.isnumeric():
-        return get_cpf(error_msg, error_msg)
-    return result
-
-
 def tela_de_depositos(conta: contas.Conta) -> None:
-    valor = get_float("Por favor digite o valor do depósito: ",
+    valor = user_inputs.get_float("Por favor digite o valor do depósito: ",
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
         banco.realizar_deposito(conta, depositos.criar_deposito(valor))
@@ -86,7 +33,7 @@ def tela_de_depositos(conta: contas.Conta) -> None:
 
 
 def tela_de_saques(conta: contas.Conta) -> None:
-    valor = get_float("Por favor digite o valor do saque: ",
+    valor = user_inputs.get_float("Por favor digite o valor do saque: ",
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
         banco.realizar_saque(conta=conta, saque=saques.criar_saque(valor))
@@ -117,17 +64,17 @@ def imprimir_extrato(conta: contas.Conta) -> None:
 
 def tela_cadastro_usuario(_) -> None:
     try:
-        nome = get_str("Digite seu nome: ")
-        data_nascimento = get_date("Digite sua data de nascimento (DD/MM/YYYY): ", 
+        nome = user_inputs.get_str("Digite seu nome: ")
+        data_nascimento = user_inputs.get_date("Digite sua data de nascimento (DD/MM/YYYY): ", 
                                    format="%d/%m/%Y")
-        cpf = get_cpf("Digite o seu CPF (Somente números): ")
-        logradouro = get_str("Digite o logradouro do endereço: ")
-        numero = get_str("Digite o número do endereço: ")
-        bairro = get_str("Digite o bairro do endereço: ")
-        cidade = get_str("Digite a cidade do endereço: ")
-        estado = get_str("Digite a sigla do estado do endereço: ").upper()
+        cpf = user_inputs.get_cpf("Digite o seu CPF (Somente números): ")
+        logradouro = user_inputs.get_str("Digite o logradouro do endereço: ")
+        numero = user_inputs.get_str("Digite o número do endereço: ")
+        bairro = user_inputs.get_str("Digite o bairro do endereço: ")
+        cidade = user_inputs.get_str("Digite a cidade do endereço: ")
+        estado = user_inputs.get_str("Digite a sigla do estado do endereço: ").upper()
         while len(estado) > 2:
-            estado = get_str("Digite a sigla do estado do endereço: ").upper()
+            estado = user_inputs.get_str("Digite a sigla do estado do endereço: ").upper()
         
         endereco = f"{logradouro}, {numero} - {bairro} - {cidade}/{estado}"
 
@@ -138,7 +85,7 @@ def tela_cadastro_usuario(_) -> None:
 
 
 def tela_login(_) -> None:
-    cpf = get_cpf("Digite o seu CPF (Somente números): ")
+    cpf = user_inputs.get_cpf("Digite o seu CPF (Somente números): ")
 
     usuario = model.usuario_model.retornar_usuario_por_cpf(cpf, USUARIO_MODEL)
 
@@ -159,7 +106,7 @@ def tela_login(_) -> None:
         
         print(f"[{ultima_opcao+1}] - Cadastrar nova conta")
 
-        opcao = get_natural(f"Digite um número de 1 à {ultima_opcao+1}: ") - 1
+        opcao = user_inputs.get_natural(f"Digite um número de 1 à {ultima_opcao+1}: ") - 1
     
         if opcao == ultima_opcao:
             conta = contas.criar_conta(usuario)
