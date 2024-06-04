@@ -157,7 +157,6 @@ def tela_geral() -> None:
         conta_ativa = secoes.valor_parametro(SECAO, "conta_ativa")
 
         if conta_ativa is not None:
-            conta_ativa = cast(contas.Conta, conta_ativa)
             nome_usuario = usuarios.nome_usuario(contas.usuario_conta(conta_ativa))
             numero = contas.numero_conta(conta_ativa)
             agencia = contas.agencia_conta(conta_ativa)
