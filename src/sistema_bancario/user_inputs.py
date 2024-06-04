@@ -1,6 +1,8 @@
 from datetime import datetime
 from functools import wraps
-from typing import Callable, Generic, Protocol, TypeVar
+from typing import Callable, Generic, Protocol, TypeAlias, TypeVar
+
+from . import contas
 
 
 class ParserError(Exception):
@@ -68,3 +70,16 @@ def get_cpf(value: str) -> str:
     if value.isnumeric():
         return value
     raise ParserError
+
+
+Acao: TypeAlias = Callable[[contas.Conta], None]
+Menu: TypeAlias = dict[str, Acao]
+
+
+def get_from_menu(menu: Menu, msg: str, error_msg: str) -> Acao:
+    def parser(value: str) -> Acao:
+        value = value.upper().strip()
+        if value in menu:
+            return menu[value]
+        raise ParserError
+    return input_getter(parser)(msg, error_msg)

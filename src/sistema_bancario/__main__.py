@@ -120,34 +120,36 @@ def encerrar_programa(_) -> None:
     sys.exit(0)
 
 
-Menu: TypeAlias = dict[str, tuple[str, Acao]]
+Menu: TypeAlias = dict[str, Acao]
 
 MENU_NAO_LOGADO: Final[Menu] = {
-    "U": ("Cadastrar usuário", tela_cadastro_usuario),
-    "L": ("Fazer login", tela_login),
-    "Q": ("Encerrar programar", encerrar_programa)
+    "U": tela_cadastro_usuario,
+    "L": tela_login,
+    "Q": encerrar_programa
 }
 
+MENU_NAO_LOGADO_STR = {
+    "U": "Cadastrar usuário",
+    "L": "Fazer login",
+    "Q": "Encerrar programar"
+}
 
 MENU: Final[Menu] = {
-    "D": ("Realizar depósito", tela_de_depositos),
-    "S": ("Realizar saque", tela_de_saques),
-    "E": ("Consultar extrato", imprimir_extrato),
-    "C": ("Sair da conta", sair_da_conta),
-    "Q": ("Encerrar programa", encerrar_programa),
+    "D": tela_de_depositos,
+    "S": tela_de_saques,
+    "E": imprimir_extrato,
+    "C": sair_da_conta,
+    "Q": encerrar_programa,
 }
 
 
-def mostra_menu(menu: Menu) -> None:
-    for opcao, valor in menu.items():
-        descricao, _ = valor
-        print(f"[{opcao}] - {descricao}")
-
-
-def recebe_opcao_do_user(menu: Menu) -> Acao:
-    opcao = input(": ").upper().strip()
-    return menu.get(opcao, ("Ausente", lambda _: print(
-        "Opção inválida! Por favor escolha uma das opções apresentadas")))[1]
+MENU_STR = {
+    "D": "Realizar depósito",
+    "S": "Realizar saque",
+    "E": "Consultar extrato",
+    "C": "Sair da conta",
+    "Q": "Encerrar programa",
+}
 
 
 def tela_geral() -> None:
@@ -161,18 +163,22 @@ def tela_geral() -> None:
             agencia = contas.agencia_conta(conta_ativa)
 
             menu = MENU
-
+            menu_str = MENU_STR
             cabecalho = f"""Olá {nome_usuario}!
 Agência: {agencia}  -  Conta: {numero} 
 Escolha a opção que deseja utilizar:"""
             
         else:
             menu = MENU_NAO_LOGADO
+            menu_str = MENU_NAO_LOGADO_STR
             cabecalho = "Bem vindo! Escolha a opção que deseja utilizar:"
         
-        print(cabecalho)
-        mostra_menu(menu)
-        acao = recebe_opcao_do_user(menu)
+        view.mostra_menu(cabecalho, menu_str)
+        acao = user_inputs.get_from_menu(
+            menu, 
+            ": ",
+            "Opção inválida! Escolha uma das opções apresentadas!\n:"
+        )
         acao(conta_ativa)
         print()
 
