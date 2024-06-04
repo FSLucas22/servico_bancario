@@ -1,5 +1,5 @@
 import sys
-from typing import Callable, Final, NoReturn, TypeAlias, cast
+from typing import Callable, Final, NoReturn, TypeAlias
 
 from . import depositos
 from . import contas
