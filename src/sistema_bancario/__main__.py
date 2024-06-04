@@ -91,13 +91,10 @@ def tela_login(_) -> None:
                                                                        CONTA_MODEL)
         ultima_opcao = len(contas_usuario)
 
-        print("Escolha a conta que deseja utilizar: ")
-        for i, conta in enumerate(contas_usuario):
-            numero = contas.numero_conta(conta)
-            agencia = contas.agencia_conta(conta)
-            print(f"[{i+1}] - {numero}/{agencia}")
+        opcoes_conta = [(contas.numero_conta(c), contas.agencia_conta(c)) 
+                          for c in contas_usuario]
         
-        print(f"[{ultima_opcao+1}] - Cadastrar nova conta")
+        view.cadastro.mostra_opcoes_conta(opcoes_conta)
 
         opcao = user_inputs.get_natural(f"Digite um número de 1 à {ultima_opcao+1}: ") - 1
     
