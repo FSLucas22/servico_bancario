@@ -1,4 +1,3 @@
-from datetime import datetime
 import sys
 from typing import Callable, Final, NoReturn, TypeAlias, cast
 
