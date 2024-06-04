@@ -2,9 +2,6 @@ from datetime import datetime
 from functools import wraps
 from typing import Callable, Generic, Protocol, TypeAlias, TypeVar
 
-from . import contas
-
-
 class ParserError(Exception):
     pass
 
