@@ -48,7 +48,7 @@ def numero_conta(conta: Conta) -> int:
     return conta["numero"]
 
 
-def agencia_conta(conta: Conta) -> int:
+def agencia_conta(conta: Conta) -> str:
     return conta["agencia"]
 
 
