@@ -95,8 +95,9 @@ def test_deve_adicionar_deposito_na_conta(conta_model, conta) -> None:
 
     conta_salva = model.conta_model.salvar_conta(conta, conta_model)
     model.conta_model.realizar_deposito(conta_salva, deposito, conta_model)
-    conta_salva = model.conta_model.retornar_conta_por_numero(1, conta_model)
+    conta_retornada = model.conta_model.retornar_conta_por_numero(1, conta_model)
 
+    assert conta_retornada is not None
     assert app.contas.saldo_conta(conta_salva) == 100.0
     assert app.contas.quantidade_operacoes(conta_salva) == 1
 
@@ -118,7 +119,9 @@ def test_deve_adicionar_saque_na_conta(conta_model, conta) -> None:
     model.conta_model.realizar_deposito(conta_salva, deposito, conta_model)
     model.conta_model.realizar_saque(conta_salva, saque, conta_model)
 
-    conta_salva = model.conta_model.retornar_conta_por_numero(1, conta_model)
+    conta_retornada = model.conta_model.retornar_conta_por_numero(1, conta_model)
+    
+    assert conta_retornada is not None
     assert app.contas.saldo_conta(conta_salva) == 70.0
     assert app.contas.quantidade_operacoes(conta_salva) == 2
 
