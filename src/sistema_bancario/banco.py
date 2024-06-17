@@ -13,10 +13,18 @@ def conta_model(banco: Banco) -> models.conta_model.ContaModel:
     return banco[0]
 
 
-def retornar_conta_salva(banco: Banco, conta: contas.Conta) -> contas.Conta | None:
+def retornar_conta_salva(banco: Banco, conta: contas.Conta) -> contas.Conta:
     model = conta_model(banco)
     numero = contas.numero_conta(conta)
-    return models.conta_model.retornar_conta_por_numero(numero, model)
+    agencia = contas.agencia_conta(conta)
+
+    conta_salva = models.conta_model.retornar_conta_por_numero(numero, 
+                                                               model, 
+                                                               agencia=agencia)
+    if conta_salva is None:
+        raise exceptions.ContaNaoExisteException(
+            f"Conta não existe com número {numero} e agência {agencia}")
+    return conta_salva
 
 
 def realizar_deposito(banco: Banco, 
