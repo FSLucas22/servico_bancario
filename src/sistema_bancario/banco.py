@@ -13,6 +13,12 @@ def conta_model(banco: Banco) -> models.conta_model.ContaModel:
     return banco[0]
 
 
+def retornar_conta_salva(banco: Banco, conta: contas.Conta) -> contas.Conta | None:
+    model = conta_model(banco)
+    numero = contas.numero_conta(conta)
+    return models.conta_model.retornar_conta_por_numero(numero, model)
+
+
 def realizar_deposito(banco: Banco, 
                       conta: contas.Conta, 
                       deposito: depositos.Deposito, /) -> None:
@@ -22,27 +28,32 @@ def realizar_deposito(banco: Banco,
 
 def realizar_saque(banco: Banco, *, conta: contas.Conta, saque: saques.Saque) -> None:
     model = conta_model(banco)
-    
-    if contas.quantidade_saques_do_dia(conta) >= contas.maximo_saques_diarios(conta):
+    conta_salva = retornar_conta_salva(banco, conta)
+
+    if contas.quantidade_saques_do_dia(conta_salva) >= contas.maximo_saques_diarios(conta_salva):
         raise exceptions.QuantidadeDeSaquesSuperiorAoLimiteException(
             "Quantidade de saques realizados superior ao máximo permitido para o dia"
         )
     
-    if contas.valor_maximo_saque(conta) < saques.valor_saque(saque):
+    if contas.valor_maximo_saque(conta_salva) < saques.valor_saque(saque):
         raise exceptions.SaqueAcimaDoValorLimiteException(
             "Valor do saque não pode ser superior ao valor limite da conta")
     
-    if contas.saldo_conta(conta) - saques.valor_saque(saque) < 0:
+    if contas.saldo_conta(conta_salva) - saques.valor_saque(saque) < 0:
         raise exceptions.SaldoInsuficienteException("Saldo insuficiente para realizar o saque")
 
-    models.conta_model.realizar_saque(conta, saque, model)
+    models.conta_model.realizar_saque(conta_salva, saque, model)
 
 
-def percorrer_operacoes(conta: contas.Conta, recebedor: Callable[[dict[str, Any]], None]):
-    for op in contas.operacoes_conta(conta):
+def percorrer_operacoes(banco,
+                        conta: contas.Conta, 
+                        recebedor: Callable[[dict[str, Any]], None]) -> None:
+    conta_salva = retornar_conta_salva(banco, conta)
+    for op in contas.operacoes_conta(conta_salva):
         recebedor(op)
 
 
-def preencher_extrato(conta: contas.Conta, extrato: extratos.Extrato) -> None:
-    percorrer_operacoes(conta, lambda op: extratos.adicionar_operacao(extrato, op))
-    extratos.atualizar_saldo(extrato, contas.saldo_conta(conta))
+def preencher_extrato(banco, conta: contas.Conta, extrato: extratos.Extrato) -> None:
+    conta_salva = retornar_conta_salva(banco, conta)
+    percorrer_operacoes(banco, conta_salva, lambda op: extratos.adicionar_operacao(extrato, op))
+    extratos.atualizar_saldo(extrato, contas.saldo_conta(conta_salva))
