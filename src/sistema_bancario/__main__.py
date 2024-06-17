@@ -21,13 +21,14 @@ Acao: TypeAlias = Callable[[T], None]
 SECAO: secoes.Secao = secoes.criar_secao()
 USUARIO_MODEL: model.usuario_model.UsuarioModel = model.usuario_model.criar_usuario_model()
 CONTA_MODEL: model.conta_model.ContaModel = model.conta_model.criar_conta_model()
+BANCO: banco.Banco = banco.criar_banco(CONTA_MODEL)
 
 
 def tela_de_depositos(conta: contas.Conta) -> None:
     valor = user_inputs.get_float("Por favor digite o valor do depósito: ",
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
-        banco.realizar_deposito(conta, depositos.criar_deposito(valor))
+        banco.realizar_deposito(BANCO, conta, depositos.criar_deposito(valor))
         view.operacoes.novo_deposito(valor)
     except exceptions.DepositoInvalidoException as e:
         view.falha(f"Falha ao realizar depósito: {str(e)}")
@@ -37,7 +38,7 @@ def tela_de_saques(conta: contas.Conta) -> None:
     valor = user_inputs.get_float("Por favor digite o valor do saque: ",
                       "Por favor digite um número válido no formato xxx.xx: ")
     try:
-        banco.realizar_saque(conta=conta, saque=saques.criar_saque(valor))
+        banco.realizar_saque(BANCO, conta=conta, saque=saques.criar_saque(valor))
         view.operacoes.novo_saque(valor)
     except (exceptions.SaldoInsuficienteException,
             exceptions.SaqueAcimaDoValorLimiteException,
