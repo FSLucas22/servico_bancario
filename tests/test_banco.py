@@ -1,72 +1,94 @@
 from datetime import datetime
 from typing import Any
 import src.sistema_bancario as app
+import src.sistema_bancario.model as model
 import pytest
 
+
+
 @pytest.fixture
-def conta() -> app.contas.Conta:
+def conta_model() -> model.conta_model.ContaModel:
+    return model.conta_model.criar_conta_model()
+
+
+@pytest.fixture
+def conta(conta_model) -> app.contas.Conta:
     usuario = app.usuarios.criar_usuario(
         "Lucas", 
         datetime(1999, 6, 22), 
         "123456789", 
         "logradouro, 0001 - bairro - cidade/UF")
     
-    return app.contas.criar_conta(usuario)
+    c = app.contas.criar_conta(usuario)
+    return model.conta_model.salvar_conta(c, conta_model)
 
 
-def test_deve_aumentar_o_saldo_com_deposito(conta) -> None:
-    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(100.0))
-    assert app.contas.quantidade_operacoes(conta) == 1
-    assert app.contas.saldo_conta(conta) == 100.0
+@pytest.fixture
+def banco(conta_model) -> app.banco.Banco:
+    return app.banco.criar_banco(conta_model)
 
 
-def test_deve_diminuir_o_saldo_com_saque(conta) -> None:
-    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(100.0))
-    app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(10.0))
-    assert app.contas.quantidade_operacoes(conta) == 2
-    assert app.contas.saldo_conta(conta) == 90.0
+def test_deve_aumentar_o_saldo_com_deposito(banco, conta_model, conta) -> None:
+    app.banco.realizar_deposito(banco, conta, app.depositos.criar_deposito(100.0))
+    conta_salva = model.conta_model.retornar_conta_por_numero(1, conta_model)
+
+    assert conta_salva is not None
+    assert app.contas.quantidade_operacoes(conta_salva) == 1
+    assert app.contas.saldo_conta(conta_salva) == 100.0
 
 
-def test_nao_deve_permitir_saque_de_valor_indisponivel(conta) -> None:
-    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(50.0))
+def test_deve_diminuir_o_saldo_com_saque(banco, conta_model, conta) -> None:
+
+    app.banco.realizar_deposito(banco, conta, app.depositos.criar_deposito(100.0))
+    app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(10.0))
+    
+    conta_salva = model.conta_model.retornar_conta_por_numero(1, conta_model)
+
+    assert conta_salva is not None
+    assert app.contas.quantidade_operacoes(conta_salva) == 2
+    assert app.contas.saldo_conta(conta_salva) == 90.0
+
+
+def test_nao_deve_permitir_saque_de_valor_indisponivel(banco, conta) -> None:
+    app.banco.realizar_deposito(banco, conta, app.depositos.criar_deposito(50.0))
     
     with pytest.raises(app.exceptions.SaldoInsuficienteException) as error_info:
-        app.banco.realizar_saque(conta=conta, 
+        app.banco.realizar_saque(banco, conta=conta, 
                                  saque=app.saques.criar_saque(100.0))
     
     assert "Saldo insuficiente para realizar o saque" in str(error_info.value)
 
 
-def test_nao_deve_permitir_saques_acima_do_valor_limite(conta) -> None:
+def test_nao_deve_permitir_saques_acima_do_valor_limite(banco, conta) -> None:
     saque = app.saques.criar_saque(501.0)
     with pytest.raises(app.exceptions.SaqueAcimaDoValorLimiteException) as error_info:
-        app.banco.realizar_saque(conta=conta, saque=saque)
+        app.banco.realizar_saque(banco, conta=conta, saque=saque)
     
     assert "Valor do saque não pode ser superior ao valor limite da conta" in str(error_info.value)
 
 
-def test_deve_contabilizar_a_quantidade_de_saques_do_dia(conta) -> None:
+def test_deve_contabilizar_a_quantidade_de_saques_do_dia(banco, conta) -> None:
     assert app.contas.quantidade_saques_do_dia(conta) == 0
-    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(100.0))
-    app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(10.0))
+    app.banco.realizar_deposito(banco, conta, app.depositos.criar_deposito(100.0))
+    app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(10.0))
     assert app.contas.quantidade_saques_do_dia(conta) == 1
 
 
-def test_deve_lancar_error_ao_realizar_mais_saques_que_o_limite_diario(conta) -> None:
-    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(100.0))
-    app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(10.0))
-    app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(10.0))
-    app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(10.0))
+def test_deve_lancar_error_ao_realizar_mais_saques_que_o_limite_diario(banco, conta) -> None:
+    app.banco.realizar_deposito(banco, conta, app.depositos.criar_deposito(100.0))
+    app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(10.0))
+    app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(10.0))
+    app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(10.0))
 
     with pytest.raises(app.exceptions.QuantidadeDeSaquesSuperiorAoLimiteException) as error_info:
-        app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(10.0))
+        app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(10.0))
     
     assert "Quantidade de saques realizados superior ao máximo permitido para o dia" in str(error_info)
 
 
-def test_deve_percorrer_operacoes(conta) -> None:
-    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(100.0))
-    app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(10.0))
+def test_deve_percorrer_operacoes(banco, conta) -> None:
+    app.banco.realizar_deposito(banco, conta, app.depositos.criar_deposito(100.0))
+    app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(10.0))
 
     operacoes = []
     def recebedor(operacao: dict[str, Any]) -> None:
@@ -79,9 +101,9 @@ def test_deve_percorrer_operacoes(conta) -> None:
     assert operacoes == ["Depósito-100.0", "Saque-10.0"]
 
 
-def test_deve_preencher_extrato(conta) -> None:
-    app.banco.realizar_deposito(conta, app.depositos.criar_deposito(100.0))
-    app.banco.realizar_saque(conta=conta, saque=app.saques.criar_saque(35.45))
+def test_deve_preencher_extrato(banco, conta) -> None:
+    app.banco.realizar_deposito(banco, conta, app.depositos.criar_deposito(100.0))
+    app.banco.realizar_saque(banco, conta=conta, saque=app.saques.criar_saque(35.45))
     extrato = app.extratos.criar_extrato()
     app.banco.preencher_extrato(conta, extrato)
     assert app.extratos.corpo_extrato(extrato) == ("Depósito: R$ 100.00", "Saque: R$ 35.45")

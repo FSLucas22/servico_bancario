@@ -1,13 +1,28 @@
-from typing import Any, Callable
+from typing import Any, Callable, NewType
 from . import contas, depositos, exceptions, saques, extratos
+from . import model as models
+
+Banco = NewType('Banco', tuple[Any])
 
 
-def realizar_deposito(conta: contas.Conta, deposito: depositos.Deposito, /) -> None:
-    contas.adicionar_operacao(conta, deposito)
-    contas.adicionar_saldo(conta, depositos.valor_deposito(deposito))
+def criar_banco(conta_model: models.conta_model.ContaModel) -> Banco:
+    return Banco((conta_model,))
 
 
-def realizar_saque(*, conta: contas.Conta, saque: saques.Saque) -> None:
+def conta_model(banco: Banco) -> models.conta_model.ContaModel:
+    return banco[0]
+
+
+def realizar_deposito(banco: Banco, 
+                      conta: contas.Conta, 
+                      deposito: depositos.Deposito, /) -> None:
+    model = conta_model(banco)
+    models.conta_model.realizar_deposito(conta, deposito, model)
+
+
+def realizar_saque(banco: Banco, *, conta: contas.Conta, saque: saques.Saque) -> None:
+    model = conta_model(banco)
+    
     if contas.quantidade_saques_do_dia(conta) >= contas.maximo_saques_diarios(conta):
         raise exceptions.QuantidadeDeSaquesSuperiorAoLimiteException(
             "Quantidade de saques realizados superior ao máximo permitido para o dia"
@@ -20,9 +35,7 @@ def realizar_saque(*, conta: contas.Conta, saque: saques.Saque) -> None:
     if contas.saldo_conta(conta) - saques.valor_saque(saque) < 0:
         raise exceptions.SaldoInsuficienteException("Saldo insuficiente para realizar o saque")
 
-    contas.adicionar_operacao(conta, saque)
-    contas.adicionar_saldo(conta,  (-1) * saques.valor_saque(saque))
-    contas.aumentar_quantidade_saques(conta)
+    models.conta_model.realizar_saque(conta, saque, model)
 
 
 def percorrer_operacoes(conta: contas.Conta, recebedor: Callable[[dict[str, Any]], None]):
