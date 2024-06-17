@@ -75,7 +75,8 @@ def test_nao_deve_permitir_saques_acima_do_valor_limite(banco, conta) -> None:
 
 def test_deve_contabilizar_a_quantidade_de_saques_do_dia(banco, conta_model, conta) -> None:
     conta_salva = model.conta_model.retornar_conta_por_numero(1, conta_model)
-
+    
+    assert conta_salva is not None
     assert app.contas.quantidade_saques_do_dia(conta_salva) == 0
     app.banco.realizar_deposito(banco, conta_salva, app.depositos.criar_deposito(100.0))
     app.banco.realizar_saque(banco, conta=conta_salva, saque=app.saques.criar_saque(10.0))
