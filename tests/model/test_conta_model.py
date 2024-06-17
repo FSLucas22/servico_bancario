@@ -121,3 +121,13 @@ def test_deve_adicionar_saque_na_conta(conta_model, conta) -> None:
     conta_salva = model.conta_model.retornar_conta_por_numero(1, conta_model)
     assert app.contas.saldo_conta(conta_salva) == 70.0
     assert app.contas.quantidade_operacoes(conta_salva) == 2
+
+
+def test_deve_lancar_erro_quando_conta_nao_existe_ao_realizar_saque(conta_model, usuario) -> None:
+    saque = app.saques.criar_saque(100.0)
+    conta = app.contas.criar_conta(usuario, 1, "0001")
+
+    with pytest.raises(app.exceptions.ContaNaoExisteException) as error_info:
+        model.conta_model.realizar_saque(conta, saque, conta_model)
+
+    assert f"Conta não existe com número 1 e agência 0001" in str(error_info)

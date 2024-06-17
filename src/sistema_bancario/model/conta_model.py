@@ -64,7 +64,11 @@ def realizar_saque(conta: contas.Conta, saque: saques.Saque, model: ContaModel) 
     numero = contas.numero_conta(conta)
     agencia = contas.agencia_conta(conta)
     conta_salva = retornar_conta_por_numero(numero, model, agencia=agencia)
-
+    
+    if conta_salva is None:
+        raise exceptions.ContaNaoExisteException(
+            f"Conta não existe com número {numero} e agência {agencia}")
+    
     contas.adicionar_operacao(conta_salva, saque)
     contas.adicionar_saldo(conta_salva, (-1) * saques.valor_saque(saque))
     
