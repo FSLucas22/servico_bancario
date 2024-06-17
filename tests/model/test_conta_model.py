@@ -124,6 +124,7 @@ def test_deve_adicionar_saque_na_conta(conta_model, conta) -> None:
     assert conta_retornada is not None
     assert app.contas.saldo_conta(conta_salva) == 70.0
     assert app.contas.quantidade_operacoes(conta_salva) == 2
+    assert app.contas.quantidade_saques_do_dia(conta_salva) == 1
 
 
 def test_deve_lancar_erro_quando_conta_nao_existe_ao_realizar_saque(conta_model, usuario) -> None:

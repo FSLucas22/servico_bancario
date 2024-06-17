@@ -71,4 +71,4 @@ def realizar_saque(conta: contas.Conta, saque: saques.Saque, model: ContaModel) 
     
     contas.adicionar_operacao(conta_salva, saque)
     contas.adicionar_saldo(conta_salva, (-1) * saques.valor_saque(saque))
-    
+    contas.aumentar_quantidade_saques(conta_salva)
