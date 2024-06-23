@@ -2,7 +2,7 @@ from typing import Any, Callable, NewType
 from . import contas, depositos, exceptions, saques, extratos
 from . import model as models
 
-Banco = NewType('Banco', tuple[Any])
+Banco = NewType('Banco', tuple[models.conta_model.ContaModel])
 
 
 def criar_banco(conta_model: models.conta_model.ContaModel) -> Banco:
