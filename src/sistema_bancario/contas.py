@@ -1,14 +1,23 @@
 from collections.abc import Iterable
-from typing import Any, NewType
+from typing import Any, Final, NewType
 
 from . import operacoes
+from . import usuarios
+
+
+AGENCIA: Final[str] = "0001"
 
 
 Conta = NewType("Conta", dict[str, Any])
 
 
-def criar_conta() -> Conta:
-    return Conta({"saldo": 0.0,
+def criar_conta(usuario: usuarios.Usuario,
+                numero: int | None = None,
+                agencia: str = AGENCIA) -> Conta:
+    return Conta({"usuario": usuario,
+                  "numero": numero,
+                  "agencia": agencia,
+                  "saldo": 0.0,
                   "operacoes": [],
                   "maximo_saques_diarios": 3,
                   "quantidade_saques_do_dia": 0,
@@ -29,6 +38,18 @@ def saldo_conta(conta: Conta) -> int:
 
 def maximo_saques_diarios(conta: Conta) -> int:
     return conta["maximo_saques_diarios"]
+
+
+def usuario_conta(conta: Conta) -> usuarios.Usuario:
+    return conta["usuario"]
+
+
+def numero_conta(conta: Conta) -> int:
+    return conta["numero"]
+
+
+def agencia_conta(conta: Conta) -> str:
+    return conta["agencia"]
 
 
 def aumentar_quantidade_saques(conta: Conta) -> None:
